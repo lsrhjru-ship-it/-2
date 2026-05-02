@@ -390,6 +390,13 @@
 // 모든 민감한 처리는 서버(Netlify Functions)에서 수행
 // =====================================================
 
+// ── 소셜 로그인 공개 Client ID 설정 ──
+// Google Client ID: Google Cloud Console > OAuth 2.0 > 클라이언트 ID
+window.__GOOGLE_CLIENT_ID__ = '여기에_구글_클라이언트_ID.apps.googleusercontent.com';
+// Discord Client ID: Discord Developer Portal > Applications > 앱 선택 > OAuth2
+window.__DISCORD_CLIENT_ID__ = '1500053167402909756';
+window.__DISCORD_REDIRECT__ = 'https://hookforwarding.netlify.app/';
+
 var API = '/.netlify/functions';
 var currentUser = null;
 var webhooks = [];  // URL 없이 {id, name, channel, date}만 저장
@@ -656,8 +663,21 @@ async function enterApp() {
   if (u.role === 'admin') document.getElementById('admin-section').style.display = 'block';
   await loadWebhooks();
   await loadLogs();
-  updateDash();
+  await updateDash();
 }
+
+// ── 세션 복원 (페이지 새로고침 시) ──
+(function() {
+  var token = sessionStorage.getItem('hp_token');
+  if (!token) return;
+  // JWT payload 디코딩 (검증은 서버에서만, 여기서는 표시용)
+  try {
+    var payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.exp && Date.now() / 1000 > payload.exp) { sessionStorage.removeItem('hp_token'); return; }
+    currentUser = { id: payload.id, username: payload.username, role: payload.role, displayName: payload.username };
+    enterApp();
+  } catch(e) { sessionStorage.removeItem('hp_token'); }
+})();
 
 function doLogout() {
   clearToken();
@@ -856,9 +876,19 @@ function switchTab(tab) {
   if (tab === 'webhooks') renderWebhooks();
 }
 
-function updateDash() {
+async function updateDash() {
   document.getElementById('stat-hooks').textContent = webhooks.length;
   document.getElementById('stat-sent').textContent = logs.length;
+
+  // 어드민이면 전체 통계도 표시
+  if (currentUser && currentUser.role === 'admin') {
+    var { ok, data } = await apiFetch('/admin/stats', { headers: authHeaders() });
+    if (ok) {
+      document.getElementById('stat-users').textContent = data.totalUsers || 0;
+      document.getElementById('stat-online').textContent = data.onlineUsers || 0;
+    }
+  }
+
   // 최근 로그 5개
   var dashLogs = document.getElementById('dash-logs');
   var recent = logs.slice(-5).reverse();
