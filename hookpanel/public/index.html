@@ -200,6 +200,10 @@
         <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
         <span class="label">메시지 발송</span>
       </div>
+      <div class="sidebar-item" onclick="switchTab('slash')" id="nav-slash">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+        <span class="label">슬래시 메시지</span>
+      </div>
       <div class="sidebar-item" onclick="switchTab('logs')" id="nav-logs">
         <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
         <span class="label">발송 로그</span>
@@ -322,6 +326,91 @@
       </div>
     </div>
 
+    <!-- SLASH MESSAGE -->
+    <div id="tab-slash" class="tab-content" style="display:none">
+      <div class="section-title">슬래시 스타일 메시지</div>
+      <div class="section-sub">Discord 슬래시 명령어 느낌의 리치 메시지를 발송합니다</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="grid-2">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div style="font-weight:600;margin-bottom:16px">기본 설정</div>
+            <div style="margin-bottom:12px"><label>웹훅 선택</label><select id="slash-hook"><option value="">웹훅을 선택하세요</option></select></div>
+            <div style="margin-bottom:12px"><label>봇 이름</label><input type="text" id="slash-username" placeholder="SlashBot" oninput="updateSlashPreview()"/></div>
+            <div style="margin-bottom:12px"><label>봇 아바타 URL</label><input type="text" id="slash-avatar" placeholder="https://..."/></div>
+            <div style="margin-bottom:12px"><label>메시지 내용 (선택)</label><textarea id="slash-content" placeholder="메시지..." oninput="updateSlashPreview()"></textarea></div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div style="font-weight:600;margin-bottom:16px">임베드</div>
+            <div style="margin-bottom:12px">
+              <label>색상</label>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="color" id="slash-color" value="#5865f2" style="width:48px;height:36px;padding:4px;cursor:pointer" oninput="updateSlashPreview()">
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <div onclick="setSlashColor('#5865f2')" style="width:24px;height:24px;border-radius:50%;background:#5865f2;cursor:pointer;border:2px solid transparent" title="블루페이"></div>
+                  <div onclick="setSlashColor('#57f287')" style="width:24px;height:24px;border-radius:50%;background:#57f287;cursor:pointer" title="그린"></div>
+                  <div onclick="setSlashColor('#fee75c')" style="width:24px;height:24px;border-radius:50%;background:#fee75c;cursor:pointer" title="옐로우"></div>
+                  <div onclick="setSlashColor('#ed4245')" style="width:24px;height:24px;border-radius:50%;background:#ed4245;cursor:pointer" title="레드"></div>
+                  <div onclick="setSlashColor('#eb459e')" style="width:24px;height:24px;border-radius:50%;background:#eb459e;cursor:pointer" title="핑크"></div>
+                  <div onclick="setSlashColor('#ffffff')" style="width:24px;height:24px;border-radius:50%;background:#ffffff;cursor:pointer;border:1px solid #555" title="화이트"></div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-bottom:12px"><label>제목</label><input type="text" id="slash-title" placeholder="임베드 제목" oninput="updateSlashPreview()"/></div>
+            <div style="margin-bottom:12px"><label>설명</label><textarea id="slash-desc" placeholder="임베드 설명..." oninput="updateSlashPreview()"></textarea></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+              <div><label>썸네일 URL</label><input type="text" id="slash-thumb" placeholder="https://..." oninput="updateSlashPreview()"/></div>
+              <div><label>이미지 URL</label><input type="text" id="slash-img" placeholder="https://..." oninput="updateSlashPreview()"/></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+              <div><label>Author 이름</label><input type="text" id="slash-author" placeholder="작성자명" oninput="updateSlashPreview()"/></div>
+              <div><label>Author 아이콘 URL</label><input type="text" id="slash-author-icon" placeholder="https://..." oninput="updateSlashPreview()"/></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+              <div><label>푸터 텍스트</label><input type="text" id="slash-footer" placeholder="푸터" oninput="updateSlashPreview()"/></div>
+              <div><label>푸터 아이콘 URL</label><input type="text" id="slash-footer-icon" placeholder="https://..." oninput="updateSlashPreview()"/></div>
+            </div>
+            <div style="margin-bottom:4px"><label>타임스탬프</label>
+              <label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px;cursor:pointer;margin:0">
+                <input type="checkbox" id="slash-timestamp" onchange="updateSlashPreview()" style="width:auto;accent-color:var(--accent)"> 현재 시간 자동 삽입
+              </label>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div style="font-weight:600">인라인 필드</div>
+              <button class="btn btn-outline btn-sm" onclick="addSlashField()">+ 필드 추가</button>
+            </div>
+            <div id="slash-fields-list"></div>
+          </div>
+
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary" onclick="sendSlashMessage()" style="flex:1;justify-content:center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>발송하기
+            </button>
+            <button class="btn btn-outline" onclick="testSlashMessage()">테스트</button>
+            <button class="btn btn-outline" onclick="clearSlashForm()">초기화</button>
+          </div>
+        </div>
+
+        <div>
+          <div style="position:sticky;top:20px">
+            <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Discord 미리보기</div>
+            <div style="background:#36393f;border-radius:12px;padding:16px;min-height:200px">
+              <div id="slash-preview-container">
+                <div style="text-align:center;color:#72767d;font-size:13px;padding:20px">내용을 입력하면 미리보기가 표시됩니다</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">JSON 미리보기</div>
+              <pre id="slash-json-preview" style="font-size:11px;color:var(--text2);overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- LOGS -->
     <div id="tab-logs" class="tab-content" style="display:none">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
@@ -404,10 +493,10 @@ var logs = [];
 var otpEmail = '';
 var otpTimer = null;
 
-// ── 인증 헬퍼 ──
-function getToken() { return sessionStorage.getItem('hp_token'); }
-function setToken(t) { sessionStorage.setItem('hp_token', t); }
-function clearToken() { sessionStorage.removeItem('hp_token'); }
+// ── 인증 헬퍼 (localStorage: 브라우저 닫아도 7일 유지) ──
+function getToken() { return localStorage.getItem('hp_token'); }
+function setToken(t) { localStorage.setItem('hp_token', t); }
+function clearToken() { localStorage.removeItem('hp_token'); }
 
 function authHeaders() {
   return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
@@ -666,17 +755,16 @@ async function enterApp() {
   await updateDash();
 }
 
-// ── 세션 복원 (페이지 새로고침 시) ──
+// ── 세션 복원 (페이지 새로고침 / 브라우저 재시작 시) ──
 (function() {
-  var token = sessionStorage.getItem('hp_token');
+  var token = localStorage.getItem('hp_token');
   if (!token) return;
-  // JWT payload 디코딩 (검증은 서버에서만, 여기서는 표시용)
   try {
     var payload = JSON.parse(atob(token.split('.')[1]));
-    if (payload.exp && Date.now() / 1000 > payload.exp) { sessionStorage.removeItem('hp_token'); return; }
+    if (payload.exp && Date.now() / 1000 > payload.exp) { localStorage.removeItem('hp_token'); return; }
     currentUser = { id: payload.id, username: payload.username, role: payload.role, displayName: payload.username };
     enterApp();
-  } catch(e) { sessionStorage.removeItem('hp_token'); }
+  } catch(e) { localStorage.removeItem('hp_token'); }
 })();
 
 function doLogout() {
@@ -701,6 +789,7 @@ async function loadWebhooks() {
   document.getElementById('webhook-count').textContent = webhooks.length;
   renderWebhooks();
   updateSendHookList();
+  updateSlashHookList();
 }
 
 function renderWebhooks() {
@@ -874,6 +963,7 @@ function switchTab(tab) {
   if (tab === 'dashboard') updateDash();
   if (tab === 'logs') loadLogs();
   if (tab === 'webhooks') renderWebhooks();
+  if (tab === 'slash') updateSlashPreview();
 }
 
 async function updateDash() {
@@ -905,7 +995,205 @@ async function updateDash() {
   }).join('') : '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">등록된 웹훅이 없습니다</div>';
 }
 
-// ── 기타 UI ──
+// ── 슬래시 스타일 메시지 ──
+var slashFields = [];
+
+function setSlashColor(hex) {
+  document.getElementById('slash-color').value = hex;
+  updateSlashPreview();
+}
+
+function addSlashField() {
+  var idx = slashFields.length;
+  slashFields.push({ name: '', value: '', inline: false });
+  var list = document.getElementById('slash-fields-list');
+  var div = document.createElement('div');
+  div.id = 'slash-field-' + idx;
+  div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px';
+  div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    + '<span style="font-size:12px;color:var(--text3)">필드 ' + (idx+1) + '</span>'
+    + '<div style="display:flex;align-items:center;gap:8px">'
+    + '<label style="display:flex;align-items:center;gap:4px;text-transform:none;letter-spacing:0;font-size:12px;cursor:pointer;margin:0">'
+    + '<input type="checkbox" id="slash-field-inline-' + idx + '" style="width:auto;accent-color:var(--accent)" onchange="updateSlashPreview()"> 인라인</label>'
+    + '<button class="btn btn-danger btn-sm" onclick="removeSlashField(' + idx + ')">✕</button></div></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    + '<div><label>필드 이름</label><input type="text" id="slash-field-name-' + idx + '" placeholder="이름" oninput="updateSlashPreview()"/></div>'
+    + '<div><label>필드 값</label><input type="text" id="slash-field-value-' + idx + '" placeholder="값" oninput="updateSlashPreview()"/></div></div>';
+  list.appendChild(div);
+  updateSlashPreview();
+}
+
+function removeSlashField(idx) {
+  var el = document.getElementById('slash-field-' + idx);
+  if (el) el.remove();
+  slashFields.splice(idx, 1);
+  // 재렌더
+  var list = document.getElementById('slash-fields-list');
+  list.innerHTML = '';
+  var tmp = slashFields.slice();
+  slashFields = [];
+  tmp.forEach(function() { addSlashField(); });
+  updateSlashPreview();
+}
+
+function buildSlashPayload() {
+  var content = document.getElementById('slash-content').value;
+  var title = document.getElementById('slash-title').value;
+  var desc = document.getElementById('slash-desc').value;
+  var color = parseInt(document.getElementById('slash-color').value.replace('#',''), 16);
+  var thumb = document.getElementById('slash-thumb').value;
+  var img = document.getElementById('slash-img').value;
+  var author = document.getElementById('slash-author').value;
+  var authorIcon = document.getElementById('slash-author-icon').value;
+  var footer = document.getElementById('slash-footer').value;
+  var footerIcon = document.getElementById('slash-footer-icon').value;
+  var useTs = document.getElementById('slash-timestamp').checked;
+
+  var embed = { color };
+  if (title) embed.title = title;
+  if (desc) embed.description = desc;
+  if (thumb) embed.thumbnail = { url: thumb };
+  if (img) embed.image = { url: img };
+  if (author) embed.author = { name: author, icon_url: authorIcon || undefined };
+  if (footer || footerIcon) embed.footer = { text: footer || '', icon_url: footerIcon || undefined };
+  if (useTs) embed.timestamp = new Date().toISOString();
+
+  // 필드 수집
+  var fields = [];
+  document.querySelectorAll('[id^="slash-field-name-"]').forEach(function(el) {
+    var i = el.id.replace('slash-field-name-', '');
+    var name = el.value;
+    var value = document.getElementById('slash-field-value-' + i) ? document.getElementById('slash-field-value-' + i).value : '';
+    var inline = document.getElementById('slash-field-inline-' + i) ? document.getElementById('slash-field-inline-' + i).checked : false;
+    if (name || value) fields.push({ name: name || '\u200b', value: value || '\u200b', inline });
+  });
+  if (fields.length) embed.fields = fields;
+
+  var payload = {};
+  if (content) payload.content = content;
+  var uname = document.getElementById('slash-username').value;
+  var avatar = document.getElementById('slash-avatar').value;
+  if (uname) payload.username = uname;
+  if (avatar) payload.avatar_url = avatar;
+  if (Object.keys(embed).length > 1) payload.embeds = [embed];
+  return payload;
+}
+
+function updateSlashPreview() {
+  var payload = buildSlashPayload();
+  var embed = payload.embeds ? payload.embeds[0] : null;
+  var botName = (document.getElementById('slash-username').value) || 'SlashBot';
+  var colorHex = document.getElementById('slash-color').value;
+
+  var html = '<div style="display:flex;gap:12px">'
+    + '<div class="avatar" style="width:36px;height:36px;font-size:14px;flex-shrink:0">' + botName.charAt(0).toUpperCase() + '</div>'
+    + '<div style="flex:1">'
+    + '<div style="color:#fff;font-weight:600;font-size:14px;margin-bottom:4px">' + botName
+    + ' <span style="background:#5865f2;color:#fff;font-size:10px;padding:2px 5px;border-radius:3px;vertical-align:middle">BOT</span></div>';
+
+  if (payload.content) html += '<div style="color:#dcddde;font-size:14px;line-height:1.6;margin-bottom:6px">' + payload.content.replace(/\n/g,'<br>') + '</div>';
+
+  if (embed) {
+    html += '<div style="background:#2f3136;border-left:4px solid ' + colorHex + ';border-radius:0 6px 6px 0;padding:14px;max-width:480px">';
+    if (embed.author) html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">'
+      + (embed.author.icon_url ? '<img src="' + embed.author.icon_url + '" style="width:20px;height:20px;border-radius:50%">' : '')
+      + '<span style="font-size:13px;font-weight:600;color:#dcddde">' + embed.author.name + '</span></div>';
+    if (embed.title) html += '<div style="color:#fff;font-weight:600;font-size:15px;margin-bottom:6px">' + embed.title + '</div>';
+    if (embed.description) html += '<div style="color:#dcddde;font-size:13px;line-height:1.6;margin-bottom:8px">' + embed.description.replace(/\n/g,'<br>') + '</div>';
+    if (embed.fields && embed.fields.length) {
+      html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">';
+      embed.fields.forEach(function(f) {
+        html += '<div style="' + (f.inline ? '' : 'grid-column:1/-1;') + '">'
+          + '<div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:2px">' + f.name + '</div>'
+          + '<div style="font-size:13px;color:#dcddde">' + f.value + '</div></div>';
+      });
+      html += '</div>';
+    }
+    if (embed.image) html += '<img src="' + embed.image.url + '" style="max-width:100%;border-radius:4px;margin-bottom:8px" onerror="this.style.display=\'none\'">';
+    if (embed.thumbnail) html += '<img src="' + embed.thumbnail.url + '" style="float:right;width:70px;height:70px;border-radius:4px;object-fit:cover;margin-left:8px" onerror="this.style.display=\'none\'">';
+    if (embed.footer || embed.timestamp) {
+      html += '<div style="font-size:11px;color:#72767d;margin-top:8px;display:flex;align-items:center;gap:6px">';
+      if (embed.footer && embed.footer.icon_url) html += '<img src="' + embed.footer.icon_url + '" style="width:16px;height:16px;border-radius:50%">';
+      if (embed.footer && embed.footer.text) html += embed.footer.text;
+      if (embed.footer && embed.footer.text && embed.timestamp) html += ' • ';
+      if (embed.timestamp) html += new Date(embed.timestamp).toLocaleString('ko');
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div></div>';
+
+  var container = document.getElementById('slash-preview-container');
+  if (payload.content || embed) {
+    container.innerHTML = html;
+  } else {
+    container.innerHTML = '<div style="text-align:center;color:#72767d;font-size:13px;padding:20px">내용을 입력하면 미리보기가 표시됩니다</div>';
+  }
+
+  // JSON 미리보기
+  document.getElementById('slash-json-preview').textContent = JSON.stringify(payload, null, 2);
+}
+
+async function sendSlashMessage() {
+  var hookId = document.getElementById('slash-hook').value;
+  if (!hookId) { notify('웹훅을 선택해주세요', 'error'); return; }
+  var payload = buildSlashPayload();
+  if (!payload.content && !payload.embeds) { notify('내용을 입력해주세요', 'error'); return; }
+
+  var { ok, data } = await apiFetch('/send', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ webhookId: hookId, ...payload })
+  });
+  if (ok) { notify('✓ 발송 완료!', 'success'); await loadLogs(); }
+  else { notify(data.error || '발송 실패', 'error'); }
+}
+
+async function testSlashMessage() {
+  var hookId = document.getElementById('slash-hook').value;
+  if (!hookId) { notify('웹훅을 선택해주세요', 'error'); return; }
+  var { ok } = await apiFetch('/send', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      webhookId: hookId,
+      username: 'SlashBot Test',
+      embeds: [{
+        color: 0x5865f2,
+        title: '🧪 슬래시 메시지 테스트',
+        description: 'HookPanel 슬래시 스타일 메시지 테스트입니다!',
+        fields: [
+          { name: '상태', value: '✅ 정상', inline: true },
+          { name: '시간', value: new Date().toLocaleString('ko'), inline: true },
+          { name: '발송자', value: currentUser ? currentUser.username : '알 수 없음', inline: true }
+        ],
+        footer: { text: 'HookPanel v3.0' },
+        timestamp: new Date().toISOString()
+      }]
+    })
+  });
+  notify(ok ? '테스트 발송 완료!' : '발송 실패', ok ? 'success' : 'error');
+}
+
+function clearSlashForm() {
+  ['slash-content','slash-username','slash-avatar','slash-title','slash-desc','slash-thumb','slash-img','slash-author','slash-author-icon','slash-footer','slash-footer-icon'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('slash-color').value = '#5865f2';
+  document.getElementById('slash-timestamp').checked = false;
+  document.getElementById('slash-fields-list').innerHTML = '';
+  slashFields = [];
+  updateSlashPreview();
+}
+
+function updateSlashHookList() {
+  var sel = document.getElementById('slash-hook');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">웹훅을 선택하세요</option>'
+    + webhooks.map(function(w) { return '<option value="' + w.id + '">' + w.name + ' (' + w.channel + ')</option>'; }).join('');
+}
+
 function showStep(step) {
   ['login','register','otp'].forEach(function(s) { document.getElementById('step-'+s).style.display = 'none'; });
   document.getElementById('step-' + step).style.display = 'block';
